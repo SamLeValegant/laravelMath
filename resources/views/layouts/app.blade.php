@@ -20,33 +20,43 @@
             @auth
                 @include('layouts.drawer')
             @endauth
-            <div id="main-content" class="ml-0 @auth md:ml-64 @endauth transition-all">
+            <div id="main-content" class="ml-0 transition-all">
                         <script>
-                        // Synchroniser la marge du contenu principal avec l'état du drawer
+                        // Drawer fermé par défaut et synchronisation de la marge
                         document.addEventListener('DOMContentLoaded', function () {
                             const drawer = document.getElementById('drawer');
                             const mainContent = document.getElementById('main-content');
                             const openBtn = document.getElementById('drawer-open');
-                            if (drawer && mainContent && openBtn) {
-                                function updateMargin() {
-                                    if (drawer.style.transform === 'translateX(-100%)') {
-                                        mainContent.classList.remove('md:ml-64');
-                                    } else {
-                                        mainContent.classList.add('md:ml-64');
-                                    }
-                                }
-                                // Sur ouverture/fermeture du drawer
-                                drawer.addEventListener('transitionend', updateMargin);
+                            const toggleBtn = document.getElementById('drawer-toggle');
+                            function closeDrawer() {
+                                drawer.style.transform = 'translateX(-100%)';
+                                openBtn.style.display = 'block';
+                                mainContent.style.marginLeft = '0';
+                            }
+                            function openDrawer() {
+                                drawer.style.transform = 'translateX(0)';
+                                openBtn.style.display = 'none';
+                                mainContent.style.marginLeft = drawer.offsetWidth + 'px';
+                            }
+                            if (drawer && mainContent && openBtn && toggleBtn) {
+                                // Drawer fermé par défaut au chargement
+                                closeDrawer();
+                                // Responsive : si on ouvre le drawer
                                 openBtn.addEventListener('click', function() {
-                                    setTimeout(updateMargin, 210);
+                                    openDrawer();
                                 });
-                                // Pour le bouton de fermeture
-                                const toggleBtn = document.getElementById('drawer-toggle');
-                                if (toggleBtn) {
-                                    toggleBtn.addEventListener('click', function() {
-                                        setTimeout(updateMargin, 210);
-                                    });
-                                }
+                                // Si on ferme le drawer
+                                toggleBtn.addEventListener('click', function() {
+                                    closeDrawer();
+                                });
+                                // Adapter la marge si la fenêtre change
+                                window.addEventListener('resize', function() {
+                                    if (drawer.style.transform === 'translateX(0)') {
+                                        mainContent.style.marginLeft = drawer.offsetWidth + 'px';
+                                    } else {
+                                        mainContent.style.marginLeft = '0';
+                                    }
+                                });
                             }
                         });
                         </script>

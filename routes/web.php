@@ -1,3 +1,4 @@
+
 <?php
 
 use App\Http\Controllers\ProfileController;
@@ -9,6 +10,9 @@ Route::get('/', function () {
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/mental', function () {
+        return view('pages.mental');
+    })->name('mental');
     Route::get('/dashboard', function () {
         return view('pages.dashboard');
     })->name('dashboard');

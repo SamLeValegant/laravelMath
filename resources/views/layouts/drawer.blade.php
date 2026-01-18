@@ -1,4 +1,4 @@
-<aside id="drawer" class="w-64 h-screen bg-white shadow-md fixed left-0 top-0 z-40 flex flex-col transition-transform duration-200 ease-in-out" style="transform: translateX(0);">
+<aside id="drawer" class="min-w-max w-auto h-screen bg-white shadow-md fixed left-0 top-0 z-40 flex flex-col transition-transform duration-200 ease-in-out px-6 pt-0" style="transform: translateX(0);">
     <div class="h-16 flex items-center justify-between border-b font-bold text-lg px-4">
         <span>Menu</span>
         <button id="drawer-toggle" class="text-gray-500 hover:text-gray-800 focus:outline-none">
@@ -10,20 +10,22 @@
     <nav class="flex-1 p-4">
         <ul class="space-y-4">
             <li>
+                <a href="{{ route('mental') }}" class="flex items-center text-gray-700 hover:text-blue-600">
+                    Calcul mental
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('dashboard') }}" class="flex items-center text-gray-700 hover:text-blue-600">
-                    <span class="material-icons mr-2">dashboard</span>
                     Dashboard
                 </a>
             </li>
             <li>
                 <a href="{{ route('profile.page') }}" class="flex items-center text-gray-700 hover:text-blue-600">
-                    <span class="material-icons mr-2">person</span>
                     Profil
                 </a>
             </li>
             <li>
                 <a href="{{ route('settings') }}" class="flex items-center text-gray-700 hover:text-blue-600">
-                    <span class="material-icons mr-2">settings</span>
                     Paramètres
                 </a>
             </li>
