@@ -10,8 +10,35 @@ Route::get('/', function () {
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/mental', function () {
-        return view('pages.mental');
+    Route::match(['get', 'post'], '/mental', function (\Illuminate\Http\Request $request) {
+        if ($request->isMethod('post')) {
+            $calculs = collect();
+            $aList = $request->input('a', []);
+            $bList = $request->input('b', []);
+            foreach ($aList as $i => $a) {
+                $b = $bList[$i] ?? 1;
+                $calculs->push(['a' => (int)$a, 'b' => (int)$b]);
+            }
+            $answers = $request->input('answer', []);
+            $results = [];
+            foreach ($calculs as $idx => $calc) {
+                $expected = $calc['a'] * $calc['b'];
+                $user = isset($answers[$idx]) ? $answers[$idx] : null;
+                $results[$idx] = ($user !== null && $user !== '' && intval($user) === $expected);
+            }
+        } else {
+            $calculs = collect();
+            for ($i = 0; $i < 50; $i++) {
+                $a = rand(1, 10);
+                $b = rand(1, 10);
+                $calculs->push(['a' => $a, 'b' => $b]);
+            }
+            $results = null;
+        }
+        return view('pages.mental', [
+            'calculs' => $calculs,
+            'results' => $results,
+        ]);
     })->name('mental');
     Route::get('/dashboard', function () {
         return view('pages.dashboard');
