@@ -1,6 +1,6 @@
-
 <?php
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -8,8 +8,22 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Route de test pour afficher la vue PDF dans le navigateur (sans DomPDF)
+    Route::get('/mental/pdf-test', function (\Illuminate\Http\Request $request) {
+        $nb = intval($request->input('nb', 50));
+        $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
+        $calculs = collect();
+        for ($i = 0; $i < $nb; $i++) {
+            $a = rand(1, 10);
+            $b = rand(1, 10);
+            $calculs->push(['a' => $a, 'b' => $b]);
+        }
+        return view('pages.mental_pdf', [
+            'calculs' => $calculs,
+        ]);
+    });
+
     Route::match(['get', 'post'], '/mental', function (\Illuminate\Http\Request $request) {
         $nb = intval($request->input('nb', 50));
         $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
@@ -43,6 +57,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'nb' => $nb,
         ]);
     })->name('mental');
+
+    Route::get('/mental/pdf', function (\Illuminate\Http\Request $request) {
+        $nb = intval($request->input('nb', 50));
+        $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
+        $calculs = collect();
+        for ($i = 0; $i < $nb; $i++) {
+            $a = rand(1, 10);
+            $b = rand(1, 10);
+            $calculs->push(['a' => $a, 'b' => $b]);
+        }
+        $pdf = Pdf::loadView('pages.mental_pdf', [
+            'calculs' => $calculs,
+        ]);
+        return $pdf->download('calcul_mental_'.$nb.'_exercices.pdf');
+    })->name('mental.pdf');
+
     Route::get('/dashboard', function () {
         return view('pages.dashboard');
     })->name('dashboard');
