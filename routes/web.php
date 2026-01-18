@@ -7,9 +7,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('pages.dashboard');
+    })->name('dashboard');
+    Route::get('/profile-page', function () {
+        return view('pages.profile');
+    })->name('profile.page');
+    Route::get('/settings', function () {
+        return view('pages.settings');
+    })->name('settings');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
