@@ -11,6 +11,8 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::match(['get', 'post'], '/mental', function (\Illuminate\Http\Request $request) {
+        $nb = intval($request->input('nb', 50));
+        $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
         if ($request->isMethod('post')) {
             $calculs = collect();
             $aList = $request->input('a', []);
@@ -28,7 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             }
         } else {
             $calculs = collect();
-            for ($i = 0; $i < 50; $i++) {
+            for ($i = 0; $i < $nb; $i++) {
                 $a = rand(1, 10);
                 $b = rand(1, 10);
                 $calculs->push(['a' => $a, 'b' => $b]);
@@ -38,6 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('pages.mental', [
             'calculs' => $calculs,
             'results' => $results,
+            'nb' => $nb,
         ]);
     })->name('mental');
     Route::get('/dashboard', function () {
