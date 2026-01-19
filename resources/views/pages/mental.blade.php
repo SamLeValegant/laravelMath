@@ -66,20 +66,17 @@
                     </div>
                 @endforeach
             </div>
-            <div class="mt-8 flex flex-col items-center gap-2">
+            <div class="mt-8 mb-8 flex flex-row items-center justify-between gap-2 w-full max-w-3xl mx-auto">
+                <form method="GET" action="{{ route('mental') }}">
+                    <input type="hidden" name="nb" value="{{ $nb ?? 50 }}" />
+                    <button type="submit" class="bg-gray-300 text-gray-800 px-6 py-2 rounded shadow hover:bg-gray-400 transition">Nouvel exercice</button>
+                </form>
                 <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition">Valider</button>
+                <form method="GET" action="{{ route('mental.pdf') }}">
+                    <input type="hidden" name="nb" value="{{ $nb ?? 50 }}" />
+                    <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded shadow hover:bg-green-700 transition">Télécharger en PDF</button>
+                </form>
             </div>
-        </form>
-        <div class="flex flex-col items-center gap-2 mt-2">
-            <form method="GET" action="{{ route('mental') }}">
-                <input type="hidden" name="nb" value="{{ $nb ?? 50 }}" />
-                <button type="submit" class="bg-gray-300 text-gray-800 px-6 py-2 rounded shadow hover:bg-gray-400 transition">Nouvel exercice</button>
-            </form>
-            <form method="GET" action="{{ route('mental.pdf') }}">
-                <input type="hidden" name="nb" value="{{ $nb ?? 50 }}" />
-                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded shadow hover:bg-green-700 transition">Télécharger en PDF</button>
-            </form>
-        </div>
         </form>
     </div>
 @endsection
