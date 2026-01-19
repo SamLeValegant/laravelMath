@@ -14,18 +14,22 @@
                     <label for="nb" class="font-medium">Nombre de calculs :</label>
                     <input type="number" min="1" max="200" id="nb" name="nb" value="{{ $nb ?? 50 }}" class="border rounded px-2 py-1 w-24 focus:outline-none focus:ring focus:border-blue-300" />
                     <label for="a_min" class="font-medium">a min :</label>
-                    <input type="number" min="1" max="99" id="a_min" name="a_min" value="{{ request('a_min', 1) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
+                    <input type="number" min="-99" max="99" id="a_min" name="a_min" value="{{ request('a_min', 1) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
                     <label for="a_max" class="font-medium">a max :</label>
-                    <input type="number" min="1" max="99" id="a_max" name="a_max" value="{{ request('a_max', 10) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
+                    <input type="number" min="-99" max="99" id="a_max" name="a_max" value="{{ request('a_max', 10) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
                     <label for="b_min" class="font-medium">b min :</label>
-                    <input type="number" min="1" max="99" id="b_min" name="b_min" value="{{ request('b_min', 1) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
+                    <input type="number" min="-99" max="99" id="b_min" name="b_min" value="{{ request('b_min', 1) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
                     <label for="b_max" class="font-medium">b max :</label>
-                    <input type="number" min="1" max="99" id="b_max" name="b_max" value="{{ request('b_max', 10) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
+                    <input type="number" min="-99" max="99" id="b_max" name="b_max" value="{{ request('b_max', 10) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
                     <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition">Appliquer</button>
                 </form>
             </div>
         </div>
-        <h1 class="text-2xl font-bold mb-6">Calcul mental</h1>
+        <h1 class="text-2xl font-bold mb-2">Calcul mental</h1>
+        <div class="mb-6 text-center text-gray-700">
+            <span class="mr-4">a : <span class="font-mono">{{ request('a_min', 1) }}</span> à <span class="font-mono">{{ request('a_max', 10) }}</span></span>
+            <span>b : <span class="font-mono">{{ request('b_min', 1) }}</span> à <span class="font-mono">{{ request('b_max', 10) }}</span></span>
+        </div>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

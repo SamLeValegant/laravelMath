@@ -13,13 +13,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/mental/pdf-test', function (\Illuminate\Http\Request $request) {
         $nb = intval($request->input('nb', 50));
         $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
-        $a_min = intval($request->input('a_min', 1));
-        $a_max = intval($request->input('a_max', 10));
-        $b_min = intval($request->input('b_min', 1));
-        $b_max = intval($request->input('b_max', 10));
-        $a_min = max(1, min($a_min, 99));
+        $a_min = is_numeric($request->input('a_min')) ? intval($request->input('a_min')) : 1;
+        $a_max = is_numeric($request->input('a_max')) ? intval($request->input('a_max')) : 10;
+        $b_min = is_numeric($request->input('b_min')) ? intval($request->input('b_min')) : 1;
+        $b_max = is_numeric($request->input('b_max')) ? intval($request->input('b_max')) : 10;
+        $a_min = max(-99, min($a_min, 99));
         $a_max = max($a_min, min($a_max, 99));
-        $b_min = max(1, min($b_min, 99));
+        $b_min = max(-99, min($b_min, 99));
         $b_max = max($b_min, min($b_max, 99));
         $calculs = collect();
         for ($i = 0; $i < $nb; $i++) {
@@ -35,13 +35,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::match(['get', 'post'], '/mental', function (\Illuminate\Http\Request $request) {
         $nb = intval($request->input('nb', 50));
         $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
-        $a_min = intval($request->input('a_min', 1));
-        $a_max = intval($request->input('a_max', 10));
-        $b_min = intval($request->input('b_min', 1));
-        $b_max = intval($request->input('b_max', 10));
-        $a_min = max(1, min($a_min, 99));
+        $a_min = is_numeric($request->input('a_min')) ? intval($request->input('a_min')) : 1;
+        $a_max = is_numeric($request->input('a_max')) ? intval($request->input('a_max')) : 10;
+        $b_min = is_numeric($request->input('b_min')) ? intval($request->input('b_min')) : 1;
+        $b_max = is_numeric($request->input('b_max')) ? intval($request->input('b_max')) : 10;
+        $a_min = max(-99, min($a_min, 99));
         $a_max = max($a_min, min($a_max, 99));
-        $b_min = max(1, min($b_min, 99));
+        $b_min = max(-99, min($b_min, 99));
         $b_max = max($b_min, min($b_max, 99));
         if ($request->isMethod('post')) {
             $calculs = collect();
@@ -81,13 +81,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/mental/pdf', function (\Illuminate\Http\Request $request) {
         $nb = intval($request->input('nb', 50));
         $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
-        $a_min = intval($request->input('a_min', 1));
-        $a_max = intval($request->input('a_max', 10));
-        $b_min = intval($request->input('b_min', 1));
-        $b_max = intval($request->input('b_max', 10));
-        $a_min = max(1, min($a_min, 99));
+        $a_min = is_numeric($request->input('a_min')) ? intval($request->input('a_min')) : 1;
+        $a_max = is_numeric($request->input('a_max')) ? intval($request->input('a_max')) : 10;
+        $b_min = is_numeric($request->input('b_min')) ? intval($request->input('b_min')) : 1;
+        $b_max = is_numeric($request->input('b_max')) ? intval($request->input('b_max')) : 10;
+        $a_min = max(-99, min($a_min, 99));
         $a_max = max($a_min, min($a_max, 99));
-        $b_min = max(1, min($b_min, 99));
+        $b_min = max(-99, min($b_min, 99));
         $b_max = max($b_min, min($b_max, 99));
         $calculs = collect();
         for ($i = 0; $i < $nb; $i++) {
