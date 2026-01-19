@@ -13,6 +13,14 @@
                 <form method="GET" action="{{ route('mental') }}" class="flex items-center gap-4 flex-wrap">
                     <label for="nb" class="font-medium">Nombre de calculs :</label>
                     <input type="number" min="1" max="200" id="nb" name="nb" value="{{ $nb ?? 50 }}" class="border rounded px-2 py-1 w-24 focus:outline-none focus:ring focus:border-blue-300" />
+                    <label for="a_min" class="font-medium">a min :</label>
+                    <input type="number" min="1" max="99" id="a_min" name="a_min" value="{{ request('a_min', 1) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
+                    <label for="a_max" class="font-medium">a max :</label>
+                    <input type="number" min="1" max="99" id="a_max" name="a_max" value="{{ request('a_max', 10) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
+                    <label for="b_min" class="font-medium">b min :</label>
+                    <input type="number" min="1" max="99" id="b_min" name="b_min" value="{{ request('b_min', 1) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
+                    <label for="b_max" class="font-medium">b max :</label>
+                    <input type="number" min="1" max="99" id="b_max" name="b_max" value="{{ request('b_max', 10) }}" class="border rounded px-2 py-1 w-16 focus:outline-none focus:ring focus:border-blue-300" />
                     <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition">Appliquer</button>
                 </form>
             </div>
@@ -46,6 +54,10 @@
         @endif
         <form method="POST" action="{{ route('mental') }}">
             <input type="hidden" name="nb" value="{{ $nb ?? 50 }}" />
+            <input type="hidden" name="a_min" value="{{ request('a_min', 1) }}" />
+            <input type="hidden" name="a_max" value="{{ request('a_max', 10) }}" />
+            <input type="hidden" name="b_min" value="{{ request('b_min', 1) }}" />
+            <input type="hidden" name="b_max" value="{{ request('b_max', 10) }}" />
             @csrf
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @foreach ($calculs ?? [] as $i => $calc)
@@ -66,17 +78,27 @@
                     </div>
                 @endforeach
             </div>
-            <div class="mt-8 mb-8 flex flex-row items-center justify-between gap-2 w-full max-w-3xl mx-auto">
-                <form method="GET" action="{{ route('mental') }}">
-                    <input type="hidden" name="nb" value="{{ $nb ?? 50 }}" />
-                    <button type="submit" class="bg-gray-300 text-gray-800 px-6 py-2 rounded shadow hover:bg-gray-400 transition">Nouvel exercice</button>
-                </form>
+            <div class="mt-8 mb-8 flex justify-center w-full max-w-3xl mx-auto">
                 <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition">Valider</button>
-                <form method="GET" action="{{ route('mental.pdf') }}">
-                    <input type="hidden" name="nb" value="{{ $nb ?? 50 }}" />
-                    <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded shadow hover:bg-green-700 transition">Télécharger en PDF</button>
-                </form>
             </div>
         </form>
+        <div class="mt-8 mb-8 flex flex-row items-center justify-between gap-2 w-full max-w-3xl mx-auto">
+            <form method="GET" action="{{ route('mental') }}">
+                <input type="hidden" name="nb" value="{{ $nb ?? 50 }}" />
+                <input type="hidden" name="a_min" value="{{ request('a_min', 1) }}" />
+                <input type="hidden" name="a_max" value="{{ request('a_max', 10) }}" />
+                <input type="hidden" name="b_min" value="{{ request('b_min', 1) }}" />
+                <input type="hidden" name="b_max" value="{{ request('b_max', 10) }}" />
+                <button type="submit" class="bg-gray-300 text-gray-800 px-6 py-2 rounded shadow hover:bg-gray-400 transition">Nouvel exercice</button>
+            </form>
+            <form method="GET" action="{{ route('mental.pdf') }}">
+                <input type="hidden" name="nb" value="{{ $nb ?? 50 }}" />
+                <input type="hidden" name="a_min" value="{{ request('a_min', 1) }}" />
+                <input type="hidden" name="a_max" value="{{ request('a_max', 10) }}" />
+                <input type="hidden" name="b_min" value="{{ request('b_min', 1) }}" />
+                <input type="hidden" name="b_max" value="{{ request('b_max', 10) }}" />
+                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded shadow hover:bg-green-700 transition">Télécharger en PDF</button>
+            </form>
+        </div>
     </div>
 @endsection

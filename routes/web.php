@@ -13,10 +13,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/mental/pdf-test', function (\Illuminate\Http\Request $request) {
         $nb = intval($request->input('nb', 50));
         $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
+        $a_min = intval($request->input('a_min', 1));
+        $a_max = intval($request->input('a_max', 10));
+        $b_min = intval($request->input('b_min', 1));
+        $b_max = intval($request->input('b_max', 10));
+        $a_min = max(1, min($a_min, 99));
+        $a_max = max($a_min, min($a_max, 99));
+        $b_min = max(1, min($b_min, 99));
+        $b_max = max($b_min, min($b_max, 99));
         $calculs = collect();
         for ($i = 0; $i < $nb; $i++) {
-            $a = rand(1, 10);
-            $b = rand(1, 10);
+            $a = rand($a_min, $a_max);
+            $b = rand($b_min, $b_max);
             $calculs->push(['a' => $a, 'b' => $b]);
         }
         return view('pages.mental_pdf', [
@@ -27,6 +35,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::match(['get', 'post'], '/mental', function (\Illuminate\Http\Request $request) {
         $nb = intval($request->input('nb', 50));
         $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
+        $a_min = intval($request->input('a_min', 1));
+        $a_max = intval($request->input('a_max', 10));
+        $b_min = intval($request->input('b_min', 1));
+        $b_max = intval($request->input('b_max', 10));
+        $a_min = max(1, min($a_min, 99));
+        $a_max = max($a_min, min($a_max, 99));
+        $b_min = max(1, min($b_min, 99));
+        $b_max = max($b_min, min($b_max, 99));
         if ($request->isMethod('post')) {
             $calculs = collect();
             $aList = $request->input('a', []);
@@ -45,8 +61,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         } else {
             $calculs = collect();
             for ($i = 0; $i < $nb; $i++) {
-                $a = rand(1, 10);
-                $b = rand(1, 10);
+                $a = rand($a_min, $a_max);
+                $b = rand($b_min, $b_max);
                 $calculs->push(['a' => $a, 'b' => $b]);
             }
             $results = null;
@@ -55,16 +71,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'calculs' => $calculs,
             'results' => $results,
             'nb' => $nb,
+            'a_min' => $a_min,
+            'a_max' => $a_max,
+            'b_min' => $b_min,
+            'b_max' => $b_max,
         ]);
     })->name('mental');
 
     Route::get('/mental/pdf', function (\Illuminate\Http\Request $request) {
         $nb = intval($request->input('nb', 50));
         $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
+        $a_min = intval($request->input('a_min', 1));
+        $a_max = intval($request->input('a_max', 10));
+        $b_min = intval($request->input('b_min', 1));
+        $b_max = intval($request->input('b_max', 10));
+        $a_min = max(1, min($a_min, 99));
+        $a_max = max($a_min, min($a_max, 99));
+        $b_min = max(1, min($b_min, 99));
+        $b_max = max($b_min, min($b_max, 99));
         $calculs = collect();
         for ($i = 0; $i < $nb; $i++) {
-            $a = rand(1, 10);
-            $b = rand(1, 10);
+            $a = rand($a_min, $a_max);
+            $b = rand($b_min, $b_max);
             $calculs->push(['a' => $a, 'b' => $b]);
         }
         $pdf = Pdf::loadView('pages.mental_pdf', [
