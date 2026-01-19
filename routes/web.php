@@ -59,24 +59,42 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $b_max = max($b_min, min($b_max, 99));
         $decimal_rate = is_numeric($request->input('decimal_rate')) ? intval($request->input('decimal_rate')) : 0;
         $decimal_places = in_array($request->input('decimal_places'), ['1','2']) ? intval($request->input('decimal_places')) : 1;
+        $operations = $request->input('operations', ['mul']);
+        if (!is_array($operations) || empty($operations)) {
+            $operations = ['mul'];
+        }
+        $validOps = ['add', 'sub', 'mul', 'div'];
+        $operations = array_values(array_intersect($operations, $validOps));
+        if (empty($operations)) {
+            $operations = ['mul'];
+        }
         if ($request->isMethod('post')) {
             $calculs = collect();
             $aList = $request->input('a', []);
             $bList = $request->input('b', []);
+            $opList = $request->input('op', []);
             foreach ($aList as $i => $a) {
                 $b = $bList[$i] ?? 1;
-                $calculs->push(['a' => (int)$a, 'b' => (int)$b]);
+                $op = $opList[$i] ?? 'mul';
+                $calculs->push(['a' => (float)$a, 'b' => (float)$b, 'op' => $op]);
             }
             $answers = $request->input('answer', []);
             $results = [];
             foreach ($calculs as $idx => $calc) {
-                $expected = $calc['a'] * $calc['b'];
+                switch ($calc['op']) {
+                    case 'add': $expected = $calc['a'] + $calc['b']; break;
+                    case 'sub': $expected = $calc['a'] - $calc['b']; break;
+                    case 'div': $expected = ($calc['b'] != 0) ? $calc['a'] / $calc['b'] : null; break;
+                    default: $expected = $calc['a'] * $calc['b'];
+                }
                 $user = isset($answers[$idx]) ? $answers[$idx] : null;
-                $results[$idx] = ($user !== null && $user !== '' && intval($user) === $expected);
+                $results[$idx] = ($user !== null && $user !== '' && floatval($user) == $expected);
             }
         } else {
             $calculs = collect();
             for ($i = 0; $i < $nb; $i++) {
+                // Choix de l'opération
+                $op = $operations[array_rand($operations)];
                 // a
                 if (mt_rand(1,100) <= $decimal_rate) {
                     $a = $a_min + mt_rand() / mt_getrandmax() * ($a_max - $a_min);
@@ -91,7 +109,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 } else {
                     $b = mt_rand((int)ceil($b_min), (int)floor($b_max));
                 }
-                $calculs->push(['a' => $a, 'b' => $b]);
+                $calculs->push(['a' => $a, 'b' => $b, 'op' => $op]);
             }
             $results = null;
         }
@@ -103,6 +121,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'a_max' => $a_max,
             'b_min' => $b_min,
             'b_max' => $b_max,
+            'operations' => $operations,
         ]);
     })->name('mental');
 

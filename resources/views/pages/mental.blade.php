@@ -11,6 +11,21 @@
             </button>
             <div id="filters-panel" class="mt-2 bg-gray-50 border rounded p-4 hidden">
                 <form method="GET" action="{{ route('mental') }}" class="flex items-center gap-4 flex-wrap">
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium">Opérations :</span>
+                        <label class="flex items-center gap-1">
+                            <input type="checkbox" name="operations[]" value="add" {{ in_array('add', (array)request('operations', ['mul'])) ? 'checked' : '' }}> +
+                        </label>
+                        <label class="flex items-center gap-1">
+                            <input type="checkbox" name="operations[]" value="sub" {{ in_array('sub', (array)request('operations', [])) ? 'checked' : '' }}> -
+                        </label>
+                        <label class="flex items-center gap-1">
+                            <input type="checkbox" name="operations[]" value="mul" {{ in_array('mul', (array)request('operations', ['mul'])) ? 'checked' : '' }}> ×
+                        </label>
+                        <label class="flex items-center gap-1">
+                            <input type="checkbox" name="operations[]" value="div" {{ in_array('div', (array)request('operations', [])) ? 'checked' : '' }}> ÷
+                        </label>
+                    </div>
                     <label for="nb" class="font-medium">Nombre de calculs :</label>
                     <input type="number" min="1" max="200" id="nb" name="nb" value="{{ $nb ?? 50 }}" class="border rounded px-2 py-1 w-24 focus:outline-none focus:ring focus:border-blue-300" />
                     <label for="a_min" class="font-medium">a min :</label>
@@ -76,17 +91,35 @@
             @csrf
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @foreach ($calculs ?? [] as $i => $calc)
+                    @php
+                        $op = $calc['op'] ?? 'mul';
+                        $opSymbol = match($op) {
+                            'add' => '+',
+                            'sub' => '-',
+                            'div' => '÷',
+                            default => '×',
+                        };
+                    @endphp
                     <div class="text-lg flex items-center gap-2 p-3">
                         <span ondblclick="editNumber(this, 'a', {{ $i }})" class="editable-number cursor-pointer select-none" title="Double-cliquez pour modifier">{{ rtrim(rtrim(number_format($calc['a'], 2, ',', ' '), '0'), ',') }}</span>
-                        ×
+                        <span>{{ $opSymbol }}</span>
                         <span ondblclick="editNumber(this, 'b', {{ $i }})" class="editable-number cursor-pointer select-none" title="Double-cliquez pour modifier">{{ rtrim(rtrim(number_format($calc['b'], 2, ',', ' '), '0'), ',') }}</span>
                         =
                         <input type="hidden" name="a[]" id="a_input_{{ $i }}" value="{{ $calc['a'] }}" />
                         <input type="hidden" name="b[]" id="b_input_{{ $i }}" value="{{ $calc['b'] }}" />
+                        <input type="hidden" name="op[]" value="{{ $op }}" />
                         <input type="number" class="border rounded px-2 py-1 w-20 focus:outline-none focus:ring focus:border-blue-300" name="answer[]" autocomplete="off"
                             value="{{ isset($results) ? (request('answer')[$i] ?? '') : old('answer.' . $i) }}" />
                         @if(isset($results))
-                            @php $expected = $calc['a'] * $calc['b']; $user = request('answer')[$i] ?? ''; @endphp
+                            @php
+                                switch($op) {
+                                    case 'add': $expected = $calc['a'] + $calc['b']; break;
+                                    case 'sub': $expected = $calc['a'] - $calc['b']; break;
+                                    case 'div': $expected = ($calc['b'] != 0) ? $calc['a'] / $calc['b'] : null; break;
+                                    default: $expected = $calc['a'] * $calc['b'];
+                                }
+                                $user = request('answer')[$i] ?? '';
+                            @endphp
                             @if($results[$i])
                                 <span class="ml-2 text-green-600 font-bold">✔</span>
                             @else
@@ -134,6 +167,14 @@
                 <input type="hidden" name="b_max" value="{{ request('b_max', 10) }}" />
                 <input type="hidden" name="decimal_rate" value="{{ request('decimal_rate', 0) }}" />
                 <input type="hidden" name="decimal_places" value="{{ request('decimal_places', 1) }}" />
+                @php
+                    // On récupère les opérations depuis la requête POST (si on vient de valider), sinon GET, sinon backend
+                    $ops = request()->isMethod('post') ? (array)request('operations', $operations ?? ['mul']) : (array)request('operations', $operations ?? ['mul']);
+                    if (!is_array($ops)) $ops = [$ops];
+                @endphp
+                @foreach($ops as $op)
+                    <input type="hidden" name="operations[]" value="{{ $op }}" />
+                @endforeach
                 <button type="submit" class="bg-gray-300 text-gray-800 px-6 py-2 rounded shadow hover:bg-gray-400 transition">Nouvel exercice</button>
             </form>
             <form method="POST" action="{{ route('mental.pdf') }}" id="pdfForm">
@@ -141,6 +182,7 @@
                 @foreach ($calculs ?? [] as $i => $calc)
                     <input type="hidden" name="a[]" id="pdf_a_{{ $i }}" value="{{ $calc['a'] }}" />
                     <input type="hidden" name="b[]" id="pdf_b_{{ $i }}" value="{{ $calc['b'] }}" />
+                    <input type="hidden" name="op[]" value="{{ $calc['op'] ?? 'mul' }}" />
                 @endforeach
                 <input type="hidden" name="nb" value="{{ $nb ?? 50 }}" />
                 <input type="hidden" name="a_min" value="{{ request('a_min', 1) }}" />

@@ -52,8 +52,17 @@
                         @php $idx = $i + $j * $rows; @endphp
                         <td>
                             @if(isset($calculsArr[$idx]))
+                                @php
+                                    $op = $calculsArr[$idx]['op'] ?? 'mul';
+                                    $opSymbol = match($op) {
+                                        'add' => '+',
+                                        'sub' => '-',
+                                        'div' => '÷',
+                                        default => '×',
+                                    };
+                                @endphp
                                 <span class="calc-eq">
-                                    {{ format_nb_pdf($calculsArr[$idx]['a'], (fmod($calculsArr[$idx]['a'],1) != 0 ? $dec : 0)) }} × {{ format_nb_pdf($calculsArr[$idx]['b'], (fmod($calculsArr[$idx]['b'],1) != 0 ? $dec : 0)) }} =
+                                    {{ format_nb_pdf($calculsArr[$idx]['a'], (fmod($calculsArr[$idx]['a'],1) != 0 ? $dec : 0)) }} {{ $opSymbol }} {{ format_nb_pdf($calculsArr[$idx]['b'], (fmod($calculsArr[$idx]['b'],1) != 0 ? $dec : 0)) }} =
                                 </span> <span class="answer-line">&nbsp;</span>
                             @endif
                         </td>
