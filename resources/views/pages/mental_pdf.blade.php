@@ -40,7 +40,7 @@
                     @php $idx = $i + $j * $rows; @endphp
                     <td>
                         @if(isset($calculsArr[$idx]))
-                            <span class="calc-eq">{{ $calculsArr[$idx]['a'] }} × {{ $calculsArr[$idx]['b'] }} =</span> <span class="answer-line">&nbsp;</span>
+                            <span class="calc-eq">{{ rtrim(rtrim(number_format($calculsArr[$idx]['a'], (fmod($calculsArr[$idx]['a'],1) != 0 ? (isset($_GET['decimal_places']) ? intval($_GET['decimal_places']) : 2) : 0), ',', ' '), '0'), ',') }} × {{ rtrim(rtrim(number_format($calculsArr[$idx]['b'], (fmod($calculsArr[$idx]['b'],1) != 0 ? (isset($_GET['decimal_places']) ? intval($_GET['decimal_places']) : 2) : 0), ',', ' '), '0'), ',') }} =</span> <span class="answer-line">&nbsp;</span>
                         @endif
                     </td>
                 @endfor
