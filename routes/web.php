@@ -106,41 +106,51 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
     })->name('mental');
 
-    Route::get('/mental/pdf', function (\Illuminate\Http\Request $request) {
-        $nb = intval($request->input('nb', 50));
-        $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
-        $a_min = is_numeric($request->input('a_min')) ? floatval($request->input('a_min')) : 1;
-        $a_max = is_numeric($request->input('a_max')) ? floatval($request->input('a_max')) : 10;
-        $b_min = is_numeric($request->input('b_min')) ? floatval($request->input('b_min')) : 1;
-        $b_max = is_numeric($request->input('b_max')) ? floatval($request->input('b_max')) : 10;
-        $a_min = max(-99, min($a_min, 99));
-        $a_max = max($a_min, min($a_max, 99));
-        $b_min = max(-99, min($b_min, 99));
-        $b_max = max($b_min, min($b_max, 99));
-        $decimal_rate = is_numeric($request->input('decimal_rate')) ? intval($request->input('decimal_rate')) : 0;
-        $decimal_places = in_array($request->input('decimal_places'), ['1','2']) ? intval($request->input('decimal_places')) : 1;
-        $calculs = collect();
-        for ($i = 0; $i < $nb; $i++) {
-            // a
-            if (mt_rand(1,100) <= $decimal_rate) {
-                $a = $a_min + mt_rand() / mt_getrandmax() * ($a_max - $a_min);
-                $a = round($a, $decimal_places);
-            } else {
-                $a = mt_rand((int)ceil($a_min), (int)floor($a_max));
+    Route::match(['get', 'post'], '/mental/pdf', function (\Illuminate\Http\Request $request) {
+        $aList = $request->input('a');
+        $bList = $request->input('b');
+        if (is_array($aList) && is_array($bList) && count($aList) === count($bList) && count($aList) > 0) {
+            $calculs = collect();
+            foreach ($aList as $i => $a) {
+                $b = $bList[$i] ?? 1;
+                $calculs->push(['a' => $a, 'b' => $b]);
             }
-            // b
-            if (mt_rand(1,100) <= $decimal_rate) {
-                $b = $b_min + mt_rand() / mt_getrandmax() * ($b_max - $b_min);
-                $b = round($b, $decimal_places);
-            } else {
-                $b = mt_rand((int)ceil($b_min), (int)floor($b_max));
+        } else {
+            $nb = intval($request->input('nb', 50));
+            $nb = ($nb > 0 && $nb <= 200) ? $nb : 50;
+            $a_min = is_numeric($request->input('a_min')) ? floatval($request->input('a_min')) : 1;
+            $a_max = is_numeric($request->input('a_max')) ? floatval($request->input('a_max')) : 10;
+            $b_min = is_numeric($request->input('b_min')) ? floatval($request->input('b_min')) : 1;
+            $b_max = is_numeric($request->input('b_max')) ? floatval($request->input('b_max')) : 10;
+            $a_min = max(-99, min($a_min, 99));
+            $a_max = max($a_min, min($a_max, 99));
+            $b_min = max(-99, min($b_min, 99));
+            $b_max = max($b_min, min($b_max, 99));
+            $decimal_rate = is_numeric($request->input('decimal_rate')) ? intval($request->input('decimal_rate')) : 0;
+            $decimal_places = in_array($request->input('decimal_places'), ['1','2']) ? intval($request->input('decimal_places')) : 1;
+            $calculs = collect();
+            for ($i = 0; $i < $nb; $i++) {
+                // a
+                if (mt_rand(1,100) <= $decimal_rate) {
+                    $a = $a_min + mt_rand() / mt_getrandmax() * ($a_max - $a_min);
+                    $a = round($a, $decimal_places);
+                } else {
+                    $a = mt_rand((int)ceil($a_min), (int)floor($a_max));
+                }
+                // b
+                if (mt_rand(1,100) <= $decimal_rate) {
+                    $b = $b_min + mt_rand() / mt_getrandmax() * ($b_max - $b_min);
+                    $b = round($b, $decimal_places);
+                } else {
+                    $b = mt_rand((int)ceil($b_min), (int)floor($b_max));
+                }
+                $calculs->push(['a' => $a, 'b' => $b]);
             }
-            $calculs->push(['a' => $a, 'b' => $b]);
         }
         $pdf = Pdf::loadView('pages.mental_pdf', [
             'calculs' => $calculs,
         ]);
-        return $pdf->download('calcul_mental_'.$nb.'_exercices.pdf');
+        return $pdf->download('calcul_mental_'.count($calculs).'_exercices.pdf');
     })->name('mental.pdf');
 
     Route::get('/dashboard', function () {

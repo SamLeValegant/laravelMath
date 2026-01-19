@@ -27,25 +27,41 @@
         </tr>
         <!-- Ligne sous-titre supprimée -->
     </table>
-    <table class="calcul-table">
-        <tbody>
-        @php
-            $cols = 5;
-            $rows = 20;
-            $calculsArr = $calculs->values();
-        @endphp
-        @for ($i = 0; $i < $rows; $i++)
-            <tr>
-                @for ($j = 0; $j < $cols; $j++)
-                    @php $idx = $i + $j * $rows; @endphp
-                    <td>
-                        @if(isset($calculsArr[$idx]))
-                            <span class="calc-eq">{{ rtrim(rtrim(number_format($calculsArr[$idx]['a'], (fmod($calculsArr[$idx]['a'],1) != 0 ? (isset($_GET['decimal_places']) ? intval($_GET['decimal_places']) : 2) : 0), ',', ' '), '0'), ',') }} × {{ rtrim(rtrim(number_format($calculsArr[$idx]['b'], (fmod($calculsArr[$idx]['b'],1) != 0 ? (isset($_GET['decimal_places']) ? intval($_GET['decimal_places']) : 2) : 0), ',', ' '), '0'), ',') }} =</span> <span class="answer-line">&nbsp;</span>
-                        @endif
-                    </td>
-                @endfor
-            </tr>
-        @endfor
+    @php
+        if (!function_exists('format_nb_pdf')) {
+            function format_nb_pdf($v, $dec) {
+                $v = (string)$v;
+                if (strpos($v, '.') !== false) {
+                    $v = number_format((float)$v, $dec, ',', ' ');
+                    $v = rtrim(rtrim($v, '0'), ',');
+                    if ($v === '' || $v === '-') $v = '0';
+                }
+                return $v === '' || $v === '-' ? '0' : $v;
+            }
+        }
+        $cols = 5;
+        $rows = 20;
+        $calculsArr = $calculs->values();
+        $dec = isset($_GET['decimal_places']) ? intval($_GET['decimal_places']) : 2;
+    @endphp
+        <table class="calcul-table">
+            <tbody>
+            @for ($i = 0; $i < $rows; $i++)
+                <tr>
+                    @for ($j = 0; $j < $cols; $j++)
+                        @php $idx = $i + $j * $rows; @endphp
+                        <td>
+                            @if(isset($calculsArr[$idx]))
+                                <span class="calc-eq">
+                                    {{ format_nb_pdf($calculsArr[$idx]['a'], (fmod($calculsArr[$idx]['a'],1) != 0 ? $dec : 0)) }} × {{ format_nb_pdf($calculsArr[$idx]['b'], (fmod($calculsArr[$idx]['b'],1) != 0 ? $dec : 0)) }} =
+                                </span> <span class="answer-line">&nbsp;</span>
+                            @endif
+                        </td>
+                    @endfor
+                </tr>
+            @endfor
+            </tbody>
+        </table>
         </tbody>
     </table>
     <div class="footer-row">

@@ -77,9 +77,12 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @foreach ($calculs ?? [] as $i => $calc)
                     <div class="text-lg flex items-center gap-2 p-3">
-                        {{ rtrim(rtrim(number_format($calc['a'], 2, ',', ' '), '0'), ',') }} × {{ rtrim(rtrim(number_format($calc['b'], 2, ',', ' '), '0'), ',') }} =
-                        <input type="hidden" name="a[]" value="{{ $calc['a'] }}" />
-                        <input type="hidden" name="b[]" value="{{ $calc['b'] }}" />
+                        <span ondblclick="editNumber(this, 'a', {{ $i }})" class="editable-number cursor-pointer select-none" title="Double-cliquez pour modifier">{{ rtrim(rtrim(number_format($calc['a'], 2, ',', ' '), '0'), ',') }}</span>
+                        ×
+                        <span ondblclick="editNumber(this, 'b', {{ $i }})" class="editable-number cursor-pointer select-none" title="Double-cliquez pour modifier">{{ rtrim(rtrim(number_format($calc['b'], 2, ',', ' '), '0'), ',') }}</span>
+                        =
+                        <input type="hidden" name="a[]" id="a_input_{{ $i }}" value="{{ $calc['a'] }}" />
+                        <input type="hidden" name="b[]" id="b_input_{{ $i }}" value="{{ $calc['b'] }}" />
                         <input type="number" class="border rounded px-2 py-1 w-20 focus:outline-none focus:ring focus:border-blue-300" name="answer[]" autocomplete="off"
                             value="{{ isset($results) ? (request('answer')[$i] ?? '') : old('answer.' . $i) }}" />
                         @if(isset($results))
@@ -92,6 +95,31 @@
                         @endif
                     </div>
                 @endforeach
+                <script>
+                function editNumber(span, type, idx) {
+                    const current = span.innerText.replace(',', '.').replace(/\s/g, '');
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.step = 'any';
+                    input.value = current;
+                    input.className = 'border rounded px-1 py-0 w-16 text-center';
+                    input.onblur = function() {
+                        let val = input.value.replace(',', '.');
+                        if (val === '' || isNaN(val)) val = current;
+                        span.innerText = val.replace('.', ',');
+                        document.getElementById(type+'_input_'+idx).value = val;
+                        span.style.display = '';
+                        input.remove();
+                    };
+                    input.onkeydown = function(e) {
+                        if (e.key === 'Enter' || e.key === 'Escape') input.blur();
+                    };
+                    span.parentNode.insertBefore(input, span);
+                    span.style.display = 'none';
+                    input.focus();
+                    input.select();
+                }
+                </script>
             </div>
             <div class="mt-8 mb-8 flex justify-center w-full max-w-3xl mx-auto">
                 <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition">Valider</button>
@@ -108,7 +136,12 @@
                 <input type="hidden" name="decimal_places" value="{{ request('decimal_places', 1) }}" />
                 <button type="submit" class="bg-gray-300 text-gray-800 px-6 py-2 rounded shadow hover:bg-gray-400 transition">Nouvel exercice</button>
             </form>
-            <form method="GET" action="{{ route('mental.pdf') }}">
+            <form method="POST" action="{{ route('mental.pdf') }}" id="pdfForm">
+                @csrf
+                @foreach ($calculs ?? [] as $i => $calc)
+                    <input type="hidden" name="a[]" id="pdf_a_{{ $i }}" value="{{ $calc['a'] }}" />
+                    <input type="hidden" name="b[]" id="pdf_b_{{ $i }}" value="{{ $calc['b'] }}" />
+                @endforeach
                 <input type="hidden" name="nb" value="{{ $nb ?? 50 }}" />
                 <input type="hidden" name="a_min" value="{{ request('a_min', 1) }}" />
                 <input type="hidden" name="a_max" value="{{ request('a_max', 10) }}" />
@@ -118,6 +151,17 @@
                 <input type="hidden" name="decimal_places" value="{{ request('decimal_places', 1) }}" />
                 <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded shadow hover:bg-green-700 transition">Télécharger en PDF</button>
             </form>
+            <script>
+            document.getElementById('pdfForm').addEventListener('submit', function(e) {
+                // Synchronise les valeurs éditées dans le DOM vers le formulaire PDF
+                @foreach ($calculs ?? [] as $i => $calc)
+                    var aVal = document.getElementById('a_input_{{ $i }}').value;
+                    var bVal = document.getElementById('b_input_{{ $i }}').value;
+                    document.getElementById('pdf_a_{{ $i }}').value = aVal;
+                    document.getElementById('pdf_b_{{ $i }}').value = bVal;
+                @endforeach
+            });
+            </script>
         </div>
     </div>
 @endsection
